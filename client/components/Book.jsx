@@ -1,5 +1,6 @@
 import React from 'react'
 import Datetime from 'react-datetime'
+import moment from 'moment'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 import {connect} from 'react-redux'
 import {ModalContainer, ModalDialog} from 'react-modal-dialog'
@@ -59,14 +60,10 @@ class Book extends React.Component {
       emailAddress: this.state.email || this.props.user.emailAddress,
       phoneNumber: this.state.phoneNumber || this.props.user.phoneNumber,
       authId: this.props.user.authId,
-      startDate: this.state.dateStart,
-      endDate: this.state.dateEnd,
+      startDate: moment(this.state.dateStart),
+      endDate: moment(this.state.dateEnd),
       purpose: this.state.purpose,
-      guestNumber: this.state.guestNumber,
-      // these details will be added on the backend - leaving them here for reference
-      // confirmed: false,
-      // dateAdded: new Date(),
-      // deleteRequested: false
+      guestNumber: this.state.guestNumber
     }
     this.props.postNewBooking(data)
     this.props.history.push('/calendar')

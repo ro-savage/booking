@@ -32,11 +32,11 @@ class Schedular extends React.Component {
 
   mousePressed (e) {
     const dateString = e.target.id.substr(4)
-    const startTime = new Date(moment(dateString, 'YYYY-MM-DD-HH-mm'))
+    const startTime = moment(dateString, 'YYYY-MM-DD-HH-mm')
     this.setState({
       selectedTime: startTime,
       startTime,
-      endTime: new Date(moment(startTime).add(30, 'minutes')),
+      endTime: moment(startTime).add(30, 'minutes'),
       mouseDown: true
     })
   }
@@ -50,17 +50,17 @@ class Schedular extends React.Component {
   mouseEnter (e) {
     if (this.state.mouseDown) {
       const dateString = e.target.id.substr(4)
-      const endTime = new Date(moment(dateString, 'YYYY-MM-DD-HH-mm'))
+      const endTime = moment(dateString, 'YYYY-MM-DD-HH-mm')
       if (endTime > this.state.selectedTime) {
         this.setState({
           startTime: this.state.selectedTime,
-          endTime: new Date(moment(endTime).add(30, 'minutes'))
+          endTime: moment(endTime).add(30, 'minutes')
         })
       }
       if (endTime < this.state.selectedTime) {
         this.setState({
           startTime: endTime,
-          endTime: new Date(moment(this.state.selectedTime).add(30, 'minutes'))
+          endTime: moment(this.state.selectedTime).add(30, 'minutes')
         })
       }
     }
@@ -106,13 +106,13 @@ class Schedular extends React.Component {
               {this.getHours()}
             </div>
             <div className='schedule-column-container yesterday'>
-              {this.getTimeSlots(new Date(moment(this.props.date).subtract(1, 'days')))}
+              {this.getTimeSlots(moment(this.props.date).subtract(1, 'days'))}
             </div>
             <div className='schedule-column-container today'>
-              {this.getTimeSlots(new Date(moment(this.props.date)))}
+              {this.getTimeSlots(moment(this.props.date))}
             </div>
             <div className='schedule-column-container tomorrow'>
-              {this.getTimeSlots(new Date(moment(this.props.date).add(1, 'days')))}
+              {this.getTimeSlots(moment(this.props.date).add(1, 'days'))}
             </div>
           </div>
         </div>
@@ -121,11 +121,11 @@ class Schedular extends React.Component {
   }
 
   getHours () {
-    const d = new Date()
+    const d = moment()
     const hourArray = []
     for (let i = 0; i < 16; i++) {
       for (let j = 0; j < 2; j++) {
-        let selectedDate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), i + 6, j * 30)
+        let selectedDate = d.set({'hours': i + 6, 'minutes': j + 30})
         let dateFormatted = moment(selectedDate).format('HH:mm')
         let divContents = ''
         let classNames = 'hour'
@@ -145,7 +145,7 @@ class Schedular extends React.Component {
     const dayArray = []
     for (let i = 0; i < 16; i++) {
       for (let j = 0; j < 2; j++) {
-        const selectedDate = new Date(d.getFullYear(), d.getMonth(), d.getDate(), i + 6, j * 30)
+        let selectedDate = d.set({'hours': i + 6, 'minutes': j + 30})
         let classNames = 'slot'
         let ptag = ''
         if (j === 1) {
@@ -163,12 +163,13 @@ class Schedular extends React.Component {
           classNames += ' reserved'
         }
         if (this.props.bookings.find(booking => {
+          console.log(moment(booking.startDate))
           return booking.startDate <= selectedDate && booking.endDate > selectedDate && booking.confirmed === true
         })) {
           classNames += ' confirmed'
         }
         const toDisplay = this.props.bookings.find(booking => {
-          return booking.startDate.getTime() === selectedDate.getTime()
+          return booking.startDate === selectedDate
         })
         if (toDisplay && toDisplay.fullName) {
           ptag = toDisplay.fullName + ' ' + toDisplay.purpose

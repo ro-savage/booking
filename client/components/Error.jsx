@@ -2,18 +2,31 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {ModalContainer, ModalDialog} from 'react-modal-dialog'
 
-function Error (props) {
-  function handleClose () {
-    props.history.push('/')
+class  Error extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      modal: true
+    }
   }
-
-  return (
-    <ModalContainer onClose={handleClose}>
-        <ModalDialog onClose={handleClose}>
-          <h1>{props.errorMessage}</h1>
-        </ModalDialog>
-    </ModalContainer>
-  )
+  handleClose () {
+    this.setState({
+      modal: false
+    })
+  }
+  render () {
+    return (
+      <div>
+        {this.props.errorMessage && this.state.modal &&
+        <ModalContainer onClose={this.handleClose}>
+            <ModalDialog onClose={this.handleClose}>
+              <h1>{this.props.errorMessage}</h1>
+            </ModalDialog>
+        </ModalContainer>
+      }
+      </div>
+    )
+  }
 }
 
 function mapStateToProps (state) {

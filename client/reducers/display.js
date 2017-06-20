@@ -1,7 +1,9 @@
+import moment from 'moment'
+
 const initialState = {
-  date: new Date(),
-  dateStart: new Date(),
-  dateEnd: new Date()
+  date: moment(),
+  dateStart: moment(),
+  dateEnd: moment()
 }
 
 const display = (state = initialState, action) => {

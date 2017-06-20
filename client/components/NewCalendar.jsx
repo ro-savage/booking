@@ -14,19 +14,19 @@ class Calendar extends React.Component {
   }
   previousMonth () {
     const d = this.props.date
-    const newD = new Date(moment(d).subtract(1, 'months'))
+    const newD = moment(d).subtract(1, 'months')
     this.props.switchDate(newD)
   }
   nextMonth () {
     const d = this.props.date
-    const newD = new Date(moment(d).add(1, 'months'))
+    const newD = moment(d).add(1, 'months')
     this.props.switchDate(newD)
   }
 
   selectDate (e) {
     const dateString = e.target.id.substr(3)
-    const dateSelected = new Date(moment(dateString, 'YYYY-MM-DD'))
-    if (!this.props.admin && dateSelected < new Date().setHours(0, 0, 0, 0)) return
+    const dateSelected = moment(dateString, 'YYYY-MM-DD')
+    if (!this.props.admin && dateSelected < moment().set(0, 'hours')) return
     this.props.switchDate(dateSelected)
     this.props.history.push('/schedule')
   }
@@ -60,58 +60,58 @@ class Calendar extends React.Component {
   }
 
   getDates (d, bookings) {
-    const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay()
-    const lastDate = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
-    const lastDay = new Date(d.getFullYear(), d.getMonth(), lastDate).getDay()
+    const firstDay = moment(d).date(1).day()
+    const lastDate = moment(d).endOf('month').date()
+    const lastDay = moment(d).endOf('month').day()
     const dateArray = []
-    let today = new Date()
-    today = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    let today = moment()
+    //today = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const adminStyle = {}
     this.props.admin ? adminStyle.cursor = 'pointer' : adminStyle.cursor = 'default'
 
     let i = 0
     while (i < firstDay) {
-      const thisDate = new Date(d.getFullYear(), d.getMonth(), 1 - firstDay + i)
+      const thisDate = moment(d).date(1 - firstDay + i)
       const thisDateFormatted = moment(thisDate).format('YYYY-MM-DD')
-      dateArray.push(<div key={thisDateFormatted} id={'day' + thisDateFormatted} className='calendar-date last-month' onClick={this.selectDate} style={adminStyle}>{thisDate.getDate()} </div>)
+      dateArray.push(<div key={thisDateFormatted} id={'day' + thisDateFormatted} className='calendar-date last-month' onClick={this.selectDate} style={adminStyle}>{thisDate.date()} </div>)
       i++
     }
     i = 1
     while (i <= lastDate) {
-      const thisDate = new Date(d.getFullYear(), d.getMonth(), i)
+      const thisDate = moment(d).date(i)
       const thisDateFormatted = moment(thisDate).format('YYYY-MM-DD')
       let classNames = 'calendar-date this-month'
-      if (thisDate.getTime() === today.getTime()) {
+      if (thisDate === today) {
         classNames += ' currentDay'
       }
-      if (thisDate.getTime() < today.getTime()) {
+      if (thisDate < today) {
         classNames += ' calendar-inactive'
       }
 
-      if (thisDate.getTime() >= today.getTime()) {
-        const thisBusy = howBusyIsIt(thisDate.getTime(), bookings)
+      if (thisDate >= today) {
+        const thisBusy = howBusyIsIt(thisDate, bookings)
         classNames += [' calendar-orange', +thisBusy].join('')
       }
 
-      dateArray.push(<div key={thisDateFormatted} id={'day' + thisDateFormatted} className={classNames} onClick={this.selectDate} style={adminStyle}> {thisDate.getDate()} </div>)
+      dateArray.push(<div key={thisDateFormatted} id={'day' + thisDateFormatted} className={classNames} onClick={this.selectDate} style={adminStyle}> {thisDate.date()} </div>)
       i++
     }
     i = 1
     while (i < 7 - lastDay) {
-      const thisDate = new Date(d.getFullYear(), d.getMonth() + 1, i)
+      const thisDate = moment(d).add(1, 'month').date(i)
       const thisDateFormatted = moment(thisDate).format('YYYY-MM-DD')
       let classNames = 'calendar-date next-month'
 
-      if (thisDate.getTime() < today.getTime()) {
+      if (thisDate < today) {
         classNames += ' calendar-inactive'
       }
 
-      if (thisDate.getTime() >= today.getTime()) {
-        const thisBusy = howBusyIsIt(thisDate.getTime(), bookings)
+      if (thisDate >= today) {
+        const thisBusy = howBusyIsIt(thisDate, bookings)
         classNames += [' calendar-orange', +thisBusy].join('')
       }
 
-      dateArray.push(<div key={thisDateFormatted} id={'day' + thisDateFormatted} className={classNames} onClick={this.selectDate}>{thisDate.getDate()} </div>)
+      dateArray.push(<div key={thisDateFormatted} id={'day' + thisDateFormatted} className={classNames} onClick={this.selectDate}>{thisDate.date()} </div>)
       i++
     }
     return dateArray

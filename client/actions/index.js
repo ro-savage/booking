@@ -38,8 +38,6 @@ function sendConfirm (data) {
 }
 
 function bookingPosted (booking) {
-  booking.startDate = new Date(booking.startDate)
-  booking.endDate = new Date(booking.endDate)
   return {
     type: BOOKINGPOSTED,
     booking
@@ -49,11 +47,7 @@ function bookingPosted (booking) {
 export const receiveBookings = bookings => {
   return {
     type: RECEIVE_BOOKINGS,
-    bookings: bookings.map(booking => {
-      booking.startDate = new Date(booking.startDate)
-      booking.endDate = new Date(booking.endDate)
-      return booking
-    })
+    bookings
   }
 }
 

@@ -2,6 +2,7 @@ const ObjectId = require('mongodb').ObjectID
 const MongoClient = require('mongodb').MongoClient
 
 const validate = require('./validation')
+const moment = require('moment')
 
 function anonGetAllBookings (cb) {
   getAllBookings((err, bookings) => {
@@ -53,8 +54,8 @@ function checkAdminStatus (authId, cb) {
 }
 
 function userAddBooking (booking, authId, cb) {
-  booking.startDate.toString()
-  booking.endDate.toString()
+  booking.startDate = moment(booking.startDate)
+  booking.endDate = moment(booking.endDate)
   let dataCheck = validate.validateBookingDetails(booking)
   if (dataCheck !== 'ok') return cb(dataCheck)
   getAllBookings((err, bookings) => {
@@ -62,10 +63,13 @@ function userAddBooking (booking, authId, cb) {
     dataCheck = validate.checkBookingForOverlap(booking, bookings)
     if (dataCheck !== 'ok') return dataCheck
     booking.confirmed = false
-    booking.dateAdded = new Date()
+    const now = moment()
+    booking.dateAdded = now
     booking.deleteRequested = false
+    console.log(booking.dateAdded)
     getDatabase((err, db) => {
       if (err) return cb(err)
+      console.log(booking)
       db.collection('bookings').save(booking, (err, result) => {
         if (err) return cb(err)
         userGetAllBookings(authId, (err, bookings) => {
@@ -106,7 +110,7 @@ function requestDelete (req, authId, cb) {
 function addUser (user, cb) {
   const dataCheck = validate.validateUserDetails(user)
   if (dataCheck !== 'ok') return cb(dataCheck)
-  user.dateAdded = new Date()
+  user.dateAdded = moment()
   getDatabase((err, db) => {
     if (err) return cb(err)
     db.collection('users').save(user, (err, result) => {
